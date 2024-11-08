@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <input
+      id="input1"
+      type="text"
+      placeholder="Ingrese el valor de la primera etiqueta"
+    />
+    <br />
+    <input
+      id="input2"
+      type="text"
+      placeholder="Ingrese el valor de la segunda etiqueta"
+    />
+    <br />
+    <input
+      id="input3"
+      type="text"
+      placeholder="Ingrese el valor de la tercera etiqueta"
+    />
+    <br />
+    <button onclick="sendPrintRequest()">Imprimir etiqueta</button>
+
+    <script>
+      function sendPrintRequest() {
+        const ip = "192.168.1.37"; // Reemplaza con la IP de tu impresora
+
+        // Obtener los valores de los inputs
+        const texto1 = document.getElementById("input1").value || "Etiqueta 1";
+        const texto2 = document.getElementById("input2").value || "Etiqueta 2";
+        const texto3 = document.getElementById("input3").value || "Etiqueta 3";
+
+        const zplCommand =
+          "^XA" +
+          "^PW1200" + // Ancho de cada etiqueta
+          "^LL200" + // Longitud de cada etiqueta
+          // Etiqueta 1
+          "^FO150,40" + // Posición de la primera etiqueta
+          "^A0N,50,50" + // Fuente de tamaño 50x50
+          "^FD" +
+          texto1 +
+          "^FS" + // Texto de la primera etiqueta
+          // Etiqueta 2
+          "^FO550,40" + // Posición de la segunda etiqueta
+          "^A0N,50,50" + // Fuente de tamaño 50x50
+          "^FD" +
+          texto2 +
+          "^FS" + // Texto de la segunda etiqueta
+          // Etiqueta 3
+          "^FO920,40" + // Posición de la tercera etiqueta
+          "^A0N,50,50" + // Fuente de tamaño 50x50
+          "^FD" +
+          texto3 +
+          "^FS" + // Texto de la tercera etiqueta
+          "^XZ"; // Fin del comando ZPL
+
+        // Enviar el comando ZPL a la impresora
+        fetch("http://localhost:3000/print", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ip, zpl: zplCommand }),
+        })
+          .then((response) => response.text())
+          .then((data) => {
+            console.log(data); // Imprimir respuesta del servidor (opcional)
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+    </script>
+  </body>
+</html>
